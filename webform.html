@@ -1,0 +1,380 @@
+<!-- webform.html -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';">
+    <title>SafeVault - 보안 폼</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f5f5; margin: 0; padding: 20px; }
+        .container { max-width: 500px; margin: 0 auto; }
+        .card { background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding: 30px; margin-bottom: 20px; }
+        h1 { color: #333; text-align: center; margin-bottom: 10px; }
+        .subtitle { color: #666; text-align: center; margin-bottom: 30px; font-size: 14px; }
+        .error { color: #d32f2f; font-size: 12px; display: none; margin-top: 5px; }
+        .input-valid { border: 2px solid #4caf50 !important; }
+        .input-invalid { border: 2px solid #d32f2f !important; }
+        label { display: block; margin-top: 15px; font-weight: 600; color: #333; }
+        input[type="text"], input[type="email"], input[type="password"] { 
+            width: 100%; padding: 12px; margin-top: 5px; border: 2px solid #ddd; border-radius: 4px; 
+            font-size: 14px; transition: border-color 0.3s;
+        }
+        input:focus { outline: none; border-color: #2196f3; }
+        button { 
+            width: 100%; margin-top: 20px; padding: 14px; background: #2196f3; color: white; 
+            border: none; border-radius: 4px; font-size: 16px; font-weight: 600; cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover:not(:disabled) { background: #1976d2; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+        .tabs { display: flex; margin-bottom: 20px; }
+        .tab { flex: 1; padding: 12px; text-align: center; cursor: pointer; border-bottom: 2px solid #ddd; transition: all 0.3s; }
+        .tab.active { border-bottom-color: #2196f3; color: #2196f3; font-weight: 600; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .message { padding: 10px; border-radius: 4px; margin-bottom: 15px; display: none; }
+        .message.success { background: #e8f5e9; color: #2e7d32; display: block; }
+        .message.error { background: #ffebee; color: #c62828; display: block; }
+        .user-info { background: #e3f2fd; padding: 15px; border-radius: 4px; margin-bottom: 15px; }
+        .user-info h3 { margin: 0 0 10px 0; color: #1976d2; }
+        .user-info p { margin: 5px 0; color: #333; }
+        .logout-btn { background: #f44336; margin-top: 10px; }
+        .logout-btn:hover { background: #d32f2f; }
+        .admin-link { background: #ff9800; margin-top: 10px; }
+        .admin-link:hover { background: #f57c00; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="card">
+        <h1>🔐 SafeVault</h1>
+        <p class="subtitle">보안 인증 시스템</p>
+        
+        <div id="authSection">
+            <div class="tabs">
+                <div class="tab active" data-tab="login">로그인</div>
+                <div class="tab" data-tab="register">회원가입</div>
+            </div>
+
+            <!-- 로그인 폼 -->
+            <div id="loginTab" class="tab-content active">
+                <div id="loginMessage" class="message"></div>
+                <form id="loginForm" novalidate>
+                    <label for="loginUsername">Username:</label>
+                    <input type="text" id="loginUsername" name="username" required 
+                           minlength="3" maxlength="50" pattern="^[a-zA-Z0-9_]+$" autocomplete="username">
+                    <span id="loginUsernameError" class="error">사용자명을 입력해주세요.</span>
+                    
+                    <label for="loginPassword">Password:</label>
+                    <input type="password" id="loginPassword" name="password" required 
+                           minlength="8" autocomplete="current-password">
+                    <span id="loginPasswordError" class="error">비밀번호를 입력해주세요.</span>
+                    
+                    <button type="submit" id="loginBtn">로그인</button>
+                </form>
+            </div>
+
+            <!-- 회원가입 폼 -->
+            <div id="registerTab" class="tab-content">
+                <div id="registerMessage" class="message"></div>
+                <form id="registerForm" novalidate>
+                    <label for="regUsername">Username:</label>
+                    <input type="text" id="regUsername" name="username" required 
+                           minlength="3" maxlength="50" pattern="^[a-zA-Z0-9_]+$" autocomplete="username">
+                    <span id="regUsernameError" class="error">사용자명은 3-50자의 영문, 숫자, 언더스코어만 허용됩니다.</span>
+                    
+                    <label for="regEmail">Email:</label>
+                    <input type="email" id="regEmail" name="email" required maxlength="100" autocomplete="email">
+                    <span id="regEmailError" class="error">유효한 이메일 주소를 입력해주세요.</span>
+                    
+                    <label for="regPassword">Password:</label>
+                    <input type="password" id="regPassword" name="password" required 
+                           minlength="8" maxlength="100" autocomplete="new-password">
+                    <span id="regPasswordError" class="error">비밀번호는 8자 이상이어야 합니다.</span>
+                    
+                    <label for="regConfirmPassword">Confirm Password:</label>
+                    <input type="password" id="regConfirmPassword" name="confirmPassword" required autocomplete="new-password">
+                    <span id="regConfirmPasswordError" class="error">비밀번호가 일치하지 않습니다.</span>
+                    
+                    <button type="submit" id="registerBtn" disabled>회원가입</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- 로그인 후 사용자 정보 -->
+        <div id="userSection" style="display: none;">
+            <div class="user-info">
+                <h3>👤 <span id="displayUsername"></span></h3>
+                <p>이메일: <span id="displayEmail"></span></p>
+                <p>역할: <span id="displayRole"></span></p>
+                <p>가입일: <span id="displayCreatedAt"></span></p>
+            </div>
+            <button id="adminBtn" class="admin-link" style="display: none;">🛡️ 관리자 대시보드</button>
+            <button id="logoutBtn" class="logout-btn">로그아웃</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const SecurityUtils = {
+    dangerousPatterns: [
+        /('|"|--)\s*(or|and)\s*('|"|\d|\w+\s*=)/gi,
+        /['";<>{}|\\&]/g,
+        /(union|select|insert|update|delete|drop|truncate|exec|execute)/gi,
+        /<script[^>]*>|<\/script>|javascript:|on\w+\s*=/gi,
+        /(%27)|(%22)|(%3C)|(%3E)|(%00)/gi
+    ],
+    
+    escapeHtml: function(str) {
+        if (!str) return '';
+        const htmlEntities = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#x27;', '/': '&#x2F;' };
+        return String(str).replace(/[&<>"'\/]/g, s => htmlEntities[s]);
+    },
+    
+    containsDangerousInput: function(input) {
+        if (!input) return false;
+        return this.dangerousPatterns.some(pattern => pattern.test(input));
+    },
+    
+    validateUsername: function(username) {
+        if (!username || username.length < 3 || username.length > 50) return { valid: false, message: '사용자명은 3-50자여야 합니다.' };
+        if (!/^[a-zA-Z0-9_]+$/.test(username)) return { valid: false, message: '영문, 숫자, 언더스코어만 허용됩니다.' };
+        if (this.containsDangerousInput(username)) return { valid: false, message: '유해한 입력이 감지되었습니다.' };
+        return { valid: true };
+    },
+    
+    validateEmail: function(email) {
+        if (!email || email.length > 100) return { valid: false, message: '이메일은 100자 이하여야 합니다.' };
+        if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)) return { valid: false, message: '유효한 이메일 형식이 아닙니다.' };
+        if (this.containsDangerousInput(email)) return { valid: false, message: '유해한 입력이 감지되었습니다.' };
+        return { valid: true };
+    },
+    
+    validatePassword: function(password) {
+        if (!password || password.length < 8) return { valid: false, message: '비밀번호는 8자 이상이어야 합니다.' };
+        return { valid: true };
+    }
+};
+
+const AuthManager = {
+    token: localStorage.getItem('authToken'),
+    user: JSON.parse(localStorage.getItem('authUser') || 'null'),
+    
+    setAuth: function(token, user) {
+        this.token = token;
+        this.user = user;
+        localStorage.setItem('authToken', token);
+        localStorage.setItem('authUser', JSON.stringify(user));
+    },
+    
+    clearAuth: function() {
+        this.token = null;
+        this.user = null;
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('authUser');
+    },
+    
+    isLoggedIn: function() {
+        return !!this.token && !!this.user;
+    },
+    
+    isAdmin: function() {
+        return this.user && this.user.role === 'Admin';
+    },
+    
+    getHeaders: function() {
+        const headers = { 'Content-Type': 'application/json' };
+        if (this.token) headers['Authorization'] = 'Bearer ' + this.token;
+        return headers;
+    }
+};
+
+document.addEventListener('DOMContentLoaded', function() {
+    const tabs = document.querySelectorAll('.tab');
+    const loginForm = document.getElementById('loginForm');
+    const registerForm = document.getElementById('registerForm');
+    const authSection = document.getElementById('authSection');
+    const userSection = document.getElementById('userSection');
+    
+    // 탭 전환
+    tabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            tabs.forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.getElementById(this.dataset.tab + 'Tab').classList.add('active');
+        });
+    });
+    
+    // 로그인 상태 확인
+    function updateUI() {
+        if (AuthManager.isLoggedIn()) {
+            authSection.style.display = 'none';
+            userSection.style.display = 'block';
+            document.getElementById('displayUsername').textContent = AuthManager.user.username;
+            document.getElementById('displayEmail').textContent = AuthManager.user.email;
+            document.getElementById('displayRole').textContent = AuthManager.user.role === 'Admin' ? '관리자' : '일반 사용자';
+            document.getElementById('displayCreatedAt').textContent = new Date(AuthManager.user.createdAt).toLocaleDateString('ko-KR');
+            document.getElementById('adminBtn').style.display = AuthManager.isAdmin() ? 'block' : 'none';
+        } else {
+            authSection.style.display = 'block';
+            userSection.style.display = 'none';
+        }
+    }
+    
+    updateUI();
+    
+    // 로그인 폼
+    loginForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const username = document.getElementById('loginUsername').value.trim();
+        const password = document.getElementById('loginPassword').value;
+        const messageDiv = document.getElementById('loginMessage');
+        
+        try {
+            const response = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                AuthManager.setAuth(result.token, result.user);
+                messageDiv.className = 'message success';
+                messageDiv.textContent = '로그인 성공!';
+                setTimeout(updateUI, 500);
+            } else {
+                messageDiv.className = 'message error';
+                messageDiv.textContent = result.message;
+            }
+        } catch (error) {
+            messageDiv.className = 'message error';
+            messageDiv.textContent = '로그인 중 오류가 발생했습니다.';
+        }
+    });
+    
+    // 회원가입 폼 검증
+    const regInputs = {
+        username: document.getElementById('regUsername'),
+        email: document.getElementById('regEmail'),
+        password: document.getElementById('regPassword'),
+        confirmPassword: document.getElementById('regConfirmPassword')
+    };
+    
+    function validateRegisterField(input, validator, errorId) {
+        const result = validator(input.value);
+        const errorEl = document.getElementById(errorId);
+        if (result.valid) {
+            input.classList.remove('input-invalid');
+            input.classList.add('input-valid');
+            errorEl.style.display = 'none';
+        } else {
+            input.classList.remove('input-valid');
+            input.classList.add('input-invalid');
+            errorEl.textContent = result.message;
+            errorEl.style.display = 'block';
+        }
+        return result.valid;
+    }
+    
+    function checkRegisterForm() {
+        const usernameValid = SecurityUtils.validateUsername(regInputs.username.value).valid;
+        const emailValid = SecurityUtils.validateEmail(regInputs.email.value).valid;
+        const passwordValid = SecurityUtils.validatePassword(regInputs.password.value).valid;
+        const confirmValid = regInputs.password.value === regInputs.confirmPassword.value && regInputs.confirmPassword.value.length > 0;
+        document.getElementById('registerBtn').disabled = !(usernameValid && emailValid && passwordValid && confirmValid);
+    }
+    
+    regInputs.username.addEventListener('input', function() {
+        validateRegisterField(this, SecurityUtils.validateUsername.bind(SecurityUtils), 'regUsernameError');
+        checkRegisterForm();
+    });
+    
+    regInputs.email.addEventListener('input', function() {
+        validateRegisterField(this, SecurityUtils.validateEmail.bind(SecurityUtils), 'regEmailError');
+        checkRegisterForm();
+    });
+    
+    regInputs.password.addEventListener('input', function() {
+        validateRegisterField(this, SecurityUtils.validatePassword.bind(SecurityUtils), 'regPasswordError');
+        checkRegisterForm();
+    });
+    
+    regInputs.confirmPassword.addEventListener('input', function() {
+        const errorEl = document.getElementById('regConfirmPasswordError');
+        if (this.value !== regInputs.password.value) {
+            this.classList.remove('input-valid');
+            this.classList.add('input-invalid');
+            errorEl.style.display = 'block';
+        } else {
+            this.classList.remove('input-invalid');
+            this.classList.add('input-valid');
+            errorEl.style.display = 'none';
+        }
+        checkRegisterForm();
+    });
+    
+    // 회원가입 제출
+    registerForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const messageDiv = document.getElementById('registerMessage');
+        
+        const data = {
+            username: regInputs.username.value.trim(),
+            email: regInputs.email.value.trim(),
+            password: regInputs.password.value,
+            confirmPassword: regInputs.confirmPassword.value
+        };
+        
+        try {
+            const response = await fetch('/api/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                AuthManager.setAuth(result.token, result.user);
+                messageDiv.className = 'message success';
+                messageDiv.textContent = '회원가입 성공!';
+                setTimeout(updateUI, 500);
+            } else {
+                messageDiv.className = 'message error';
+                messageDiv.textContent = result.message;
+            }
+        } catch (error) {
+            messageDiv.className = 'message error';
+            messageDiv.textContent = '회원가입 중 오류가 발생했습니다.';
+        }
+    });
+    
+    // 로그아웃
+    document.getElementById('logoutBtn').addEventListener('click', function() {
+        AuthManager.clearAuth();
+        updateUI();
+    });
+    
+    // 관리자 대시보드
+    document.getElementById('adminBtn').addEventListener('click', function() {
+        window.location.href = '/admin.html';
+    });
+    
+    // 붙여넣기 시 위험 입력 차단
+    Object.values(regInputs).forEach(input => {
+        input.addEventListener('paste', function(e) {
+            const pastedText = (e.clipboardData || window.clipboardData).getData('text');
+            if (SecurityUtils.containsDangerousInput(pastedText)) {
+                e.preventDefault();
+                alert('유해한 내용이 포함된 텍스트는 붙여넣을 수 없습니다.');
+            }
+        });
+    });
+});
+</script>
+</body>
+</html>

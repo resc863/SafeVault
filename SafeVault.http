@@ -1,0 +1,171 @@
+@SafeVault_HostAddress = http://localhost:5194
+@token = YOUR_JWT_TOKEN_HERE
+
+### Health Check
+GET {{SafeVault_HostAddress}}/health
+Accept: application/json
+
+###
+
+### 회원가입
+POST {{SafeVault_HostAddress}}/api/auth/register
+Content-Type: application/json
+
+{
+    "username": "testuser",
+    "email": "test@example.com",
+    "password": "Test@1234",
+    "confirmPassword": "Test@1234"
+}
+
+###
+
+### 로그인
+POST {{SafeVault_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+    "username": "admin",
+    "password": "Admin@123!"
+}
+
+###
+
+### 현재 사용자 정보 (인증 필요)
+GET {{SafeVault_HostAddress}}/api/auth/me
+Accept: application/json
+Authorization: Bearer {{token}}
+
+###
+
+### 토큰 검증 (인증 필요)
+GET {{SafeVault_HostAddress}}/api/auth/validate
+Accept: application/json
+Authorization: Bearer {{token}}
+
+###
+
+### ===== 관리자 API (Admin 역할 필요) =====
+
+### 대시보드 통계
+GET {{SafeVault_HostAddress}}/api/admin/dashboard
+Accept: application/json
+Authorization: Bearer {{token}}
+
+###
+
+### 사용자 목록 조회
+GET {{SafeVault_HostAddress}}/api/admin/users?page=1&pageSize=20
+Accept: application/json
+Authorization: Bearer {{token}}
+
+###
+
+### 특정 사용자 조회
+GET {{SafeVault_HostAddress}}/api/admin/users/1
+Accept: application/json
+Authorization: Bearer {{token}}
+
+###
+
+### 사용자 역할 변경
+PUT {{SafeVault_HostAddress}}/api/admin/users/2/role
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "userId": 2,
+    "newRole": "Admin"
+}
+
+###
+
+### 사용자 비활성화
+PUT {{SafeVault_HostAddress}}/api/admin/users/2/deactivate
+Accept: application/json
+Authorization: Bearer {{token}}
+
+###
+
+### 사용자 활성화
+PUT {{SafeVault_HostAddress}}/api/admin/users/2/activate
+Accept: application/json
+Authorization: Bearer {{token}}
+
+###
+
+### 검증 로그 조회
+GET {{SafeVault_HostAddress}}/api/admin/logs?page=1&pageSize=50
+Accept: application/json
+Authorization: Bearer {{token}}
+
+###
+
+### 차단된 로그만 조회
+GET {{SafeVault_HostAddress}}/api/admin/logs?page=1&pageSize=50&filter=BLOCKED
+Accept: application/json
+Authorization: Bearer {{token}}
+
+###
+
+### 차단 패턴 목록 조회
+GET {{SafeVault_HostAddress}}/api/admin/patterns
+Accept: application/json
+Authorization: Bearer {{token}}
+
+###
+
+### 차단 패턴 추가
+POST {{SafeVault_HostAddress}}/api/admin/patterns
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "pattern": "<marquee",
+    "patternType": 1,
+    "description": "marquee 태그 차단"
+}
+
+###
+
+### 차단 패턴 토글 (활성화/비활성화)
+PUT {{SafeVault_HostAddress}}/api/admin/patterns/1/toggle
+Accept: application/json
+Authorization: Bearer {{token}}
+
+###
+
+### ===== 폼 API =====
+
+### 입력값 검증
+POST {{SafeVault_HostAddress}}/api/form/validate
+Content-Type: application/json
+
+{
+    "value": "testuser123",
+    "fieldType": "USERNAME"
+}
+
+###
+
+### SQL 인젝션 테스트 (차단되어야 함)
+POST {{SafeVault_HostAddress}}/api/form/validate
+Content-Type: application/json
+
+{
+    "value": "' OR '1'='1",
+    "fieldType": "USERNAME"
+}
+
+###
+
+### XSS 테스트 (차단되어야 함)
+POST {{SafeVault_HostAddress}}/api/form/validate
+Content-Type: application/json
+
+{
+    "value": "<script>alert('xss')</script>",
+    "fieldType": "USERNAME"
+}
+
+###
